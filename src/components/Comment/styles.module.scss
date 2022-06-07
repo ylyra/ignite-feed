@@ -1,0 +1,85 @@
+.comment {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+
+  .commentBox {
+    flex: 1;
+  }
+
+  .commentContent {
+    background: var(--gray-700);
+    border-radius: 8px;
+    padding: 1rem;
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+
+      button {
+        background: transparent;
+        border: none;
+        color: var(--gray-400);
+
+        line-height: 0;
+        border-radius: 2px;
+
+        transition: color 0.2s;
+
+        &:hover,
+        &:focus {
+          color: var(--red-500);
+        }
+      }
+    }
+
+    p {
+      margin-top: 1rem;
+      color: var(--gray-300);
+    }
+  }
+
+  .authorAndTime {
+    display: flex;
+    flex-direction: column;
+
+    strong {
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    time {
+      font-size: 0.75rem;
+      line-height: 1.6;
+      color: var(--gray-400);
+    }
+  }
+
+  .likePost {
+    margin-top: 1rem;
+    background: transparent;
+    border: 0;
+    border-radius: 2px;
+    color: var(--gray-400);
+
+    display: flex;
+    align-items: center;
+
+    transition: color 0.2s;
+
+    &:hover,
+    &:focus {
+      color: var(--green-300);
+    }
+
+    svg {
+      margin-right: 0.5rem;
+    }
+
+    span::before {
+      content: "\2022";
+      padding: 0 0.25rem;
+    }
+  }
+}
