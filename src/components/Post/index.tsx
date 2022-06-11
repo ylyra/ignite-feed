@@ -1,4 +1,8 @@
+import { format, formatDistanceToNow } from "date-fns";
+import ptBR from "date-fns/locale/pt-BR";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+
 import { Avatar } from "../Avatar";
 import { Comment } from "../Comment";
 import styles from "./styles.module.scss";
@@ -24,44 +28,68 @@ type CommentFormProps = {
 };
 
 export function Post({ post }: PostProps) {
-  const { handleSubmit, register } = useForm<CommentFormProps>({
+  const publishedDateFormatted = format(
+    post.publishedAt,
+    "dd 'de' LLLL 'às' HH:mm'h'",
+    {
+      locale: ptBR,
+    }
+  );
+  const publishedDateRelativeToNow = formatDistanceToNow(post.publishedAt, {
+    locale: ptBR,
+    addSuffix: true,
+  });
+  const { handleSubmit, register, reset } = useForm<CommentFormProps>({
     defaultValues: {
       comment: "",
     },
   });
+  const [comments, setComments] = useState(["Post muito bacana, hein?!"]);
 
-  const onSubmit: SubmitHandler<CommentFormProps> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<CommentFormProps> = (data, e) => {
+    setComments((oldComments) => [...oldComments, data.comment]);
+    reset();
+  };
+
+  const handleDeleteComment = (comment: string) => {
+    setComments((oldComments) => oldComments.filter((c) => c !== comment));
   };
 
   return (
     <article className={styles.post}>
       <header>
         <div className={styles.author}>
-          <Avatar hasBorder src="https://i.pravatar.cc/150" alt="avatar" />
+          <Avatar hasBorder src={post.author.avatar} alt="avatar" />
           <div className={styles.authorInfo}>
-            <strong>Darrell Robinson</strong>
-            <span>Web Developer</span>
+            <strong>{post.author.name}</strong>
+            <span>{post.author.role}</span>
           </div>
         </div>
-        <time title="11 de Maior às 08:13" dateTime="2022-05-11 08:13:30">
-          Publicado há 1h
+        <time
+          title={publishedDateFormatted}
+          dateTime={post.publishedAt.toISOString()}
+        >
+          {publishedDateRelativeToNow}
         </time>
       </header>
 
       <main className={styles.content}>
-        <p>Fala galeraa 👋</p>
-        <p>
-          Acabei de subir mais um projeto no meu portifa. É um projeto que fiz
-          no NLW Return, evento da Rocketseat. O nome do projeto é DoctorCare 🚀
-        </p>
-        <p>
-          <a href="#">👉 jane.design/doctorcare</a>
-        </p>
-        <p>
-          <a href="#">#novoprojeto</a> <a href="#">#nlw</a>{" "}
-          <a href="#">#rocketseat</a>
-        </p>
+        {post.content.map((content) => {
+          switch (content.type) {
+            case "paragraph":
+              return <p>{content.content}</p>;
+            case "link":
+              return (
+                <p>
+                  <a href={content.content} target="_blank">
+                    {content.content}
+                  </a>
+                </p>
+              );
+            default:
+              return null;
+          }
+        })}
       </main>
 
       <footer>
@@ -81,9 +109,13 @@ export function Post({ post }: PostProps) {
       </footer>
 
       <div className={styles.comments}>
-        <Comment />
-        <Comment />
-        <Comment />
+        {comments.map((comment) => (
+          <Comment
+            key={comment}
+            comment={comment}
+            onDelete={handleDeleteComment}
+          />
+        ))}
       </div>
     </article>
   );
